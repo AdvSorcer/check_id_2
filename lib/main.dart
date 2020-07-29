@@ -54,27 +54,37 @@ class _MyBodyState extends State<MyBody> {
       future: futureBadIds,
       builder: (context, snapshot) {
         if (snapshot.hasData) {
+          snapshot.data.result.records.sort((a, b) =>
+              a.lineId.toLowerCase().compareTo(b.lineId.toLowerCase()));
+
           return ListView.builder(
               padding: const EdgeInsets.all(8),
               itemCount: snapshot.data.result.records.length,
               itemBuilder: (BuildContext context, int index) {
-                return Container(
-                  height: 50,
-                  child: Center(
-                    child: Card(
-                      child: InkWell(
-                        splashColor: Colors.blue.withAlpha(30),
-                        child: Container(
-                          width: 200,
-                          height: 50,
-                          child: Center(
-                            child: Text(
-                                snapshot.data.result.records[index].lineId),
-                          ),
-                        ),
-                      ),
+                String _lineId = snapshot.data.result.records[index].lineId;
+                String _alertDate =
+                    snapshot.data.result.records[index].alertDate;
+                return Column(
+                  children: <Widget>[
+                    Center(
+                      child: ListTile(
+                          title: Text(_lineId),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Text(_alertDate),
+                            ],
+                          )),
                     ),
-                  ),
+                    Divider(
+                      color: Colors.grey,
+                      height: 10,
+                      thickness: 2,
+                    ),
+                  ],
                 );
               });
         } else if (snapshot.hasError) {
