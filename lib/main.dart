@@ -15,18 +15,40 @@ class MyApp extends StatelessWidget {
             '帳號顯示',
           ),
         ),
-        body: MyBody(),
+        body: Column(
+          children: <Widget>[
+            TextField(
+              onChanged: (text) {
+                print("First text field: $text");
+              },
+            ),
+            RaisedButton(
+              child: Text('Button'),
+              onPressed: () {
+                print('you push me');
+              },
+            ),
+            MyBody(),
+          ],
+        ),
       ),
     );
   }
 }
 
 class MyBody extends StatefulWidget {
+  //MyBody({this.lineid3});
+  //String lineid3;
   @override
   _MyBodyState createState() => _MyBodyState();
 }
 
 class _MyBodyState extends State<MyBody> {
+  //_MyBodyState({this.lineid2});
+  //String lineid2;
+
+  //String searchString = "1234";
+
   //TODO : init
   Future<Welcome> fetchBadIds() async {
     try {
@@ -54,39 +76,46 @@ class _MyBodyState extends State<MyBody> {
       future: futureBadIds,
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          snapshot.data.result.records.sort((a, b) =>
+          //copy a snapshot
+          List _newss = snapshot.data.result.records.sublist(0);
+          _newss.sort((a, b) =>
               a.lineId.toLowerCase().compareTo(b.lineId.toLowerCase()));
+          _newss = _newss.where((e) => e.lineId.contains("123")).toList();
+          int aa = _newss.length;
+          int bb = snapshot.data.result.records.length;
+          //print(aa.toString() + " :" + bb.toString());
 
-          return ListView.builder(
-              padding: const EdgeInsets.all(8),
-              itemCount: snapshot.data.result.records.length,
-              itemBuilder: (BuildContext context, int index) {
-                String _lineId = snapshot.data.result.records[index].lineId;
-                String _alertDate =
-                    snapshot.data.result.records[index].alertDate;
-                return Column(
-                  children: <Widget>[
-                    Center(
-                      child: ListTile(
-                          title: Text(_lineId),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              SizedBox(
-                                height: 10,
-                              ),
-                              Text(_alertDate),
-                            ],
-                          )),
-                    ),
-                    Divider(
-                      color: Colors.grey,
-                      height: 10,
-                      thickness: 2,
-                    ),
-                  ],
-                );
-              });
+          return Expanded(
+            child: ListView.builder(
+                padding: const EdgeInsets.all(8),
+                itemCount: _newss.length,
+                itemBuilder: (BuildContext context, int index) {
+                  String _lineId = _newss[index].lineId;
+                  String _alertDate = _newss[index].alertDate;
+                  return Column(
+                    children: <Widget>[
+                      Center(
+                        child: ListTile(
+                            title: Text(_lineId),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Text(_alertDate),
+                              ],
+                            )),
+                      ),
+                      Divider(
+                        color: Colors.grey,
+                        height: 10,
+                        thickness: 2,
+                      ),
+                    ],
+                  );
+                }),
+          );
         } else if (snapshot.hasError) {
           return Text("${snapshot.error}");
         }
