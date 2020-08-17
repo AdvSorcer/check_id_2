@@ -10,44 +10,68 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(
-          title: Text(
-            '帳號顯示',
+          appBar: AppBar(
+            title: Text(
+              '帳號顯示',
+            ),
           ),
-        ),
-        body: Column(
-          children: <Widget>[
-            TextField(
-              onChanged: (text) {
-                print("First text field: $text");
-              },
-            ),
-            RaisedButton(
-              child: Text('Button'),
-              onPressed: () {
-                print('you push me');
-              },
-            ),
-            MyBody(),
-          ],
-        ),
-      ),
+          body: Home()),
     );
   }
 }
 
+//widget 1
+class Home extends StatefulWidget {
+  @override
+  _HomeState createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
+  String queryString = "";
+
+  void update(String qs) {
+    setState(() {
+      queryString = qs;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: <Widget>[
+        TextField(
+          onChanged: (text) {
+            print("First text field: $text");
+            update(text);
+          },
+          decoration: InputDecoration(
+            hintText: "請輸入查詢ＩＤ",
+            contentPadding: EdgeInsets.only(left: 30),
+          ),
+        ),
+        SizedBox(
+          height: 20,
+        ),
+        Text("以下是被通報的所有詐騙ＩＤ"),
+        MyBody(
+          queryString: queryString,
+        ),
+      ],
+    );
+  }
+}
+
+// widget 2
 class MyBody extends StatefulWidget {
-  //MyBody({this.lineid3});
-  //String lineid3;
+  final String queryString;
+  MyBody({this.queryString});
+
   @override
   _MyBodyState createState() => _MyBodyState();
 }
 
 class _MyBodyState extends State<MyBody> {
-  //_MyBodyState({this.lineid2});
-  //String lineid2;
-
-  //String searchString = "1234";
+  String searchString = "";
 
   //TODO : init
   Future<Welcome> fetchBadIds() async {
@@ -72,6 +96,8 @@ class _MyBodyState extends State<MyBody> {
 
   @override
   Widget build(BuildContext context) {
+    String queryStr = "";
+    queryStr = widget.queryString;
     return FutureBuilder<Welcome>(
       future: futureBadIds,
       builder: (context, snapshot) {
@@ -80,7 +106,7 @@ class _MyBodyState extends State<MyBody> {
           List _newss = snapshot.data.result.records.sublist(0);
           _newss.sort((a, b) =>
               a.lineId.toLowerCase().compareTo(b.lineId.toLowerCase()));
-          _newss = _newss.where((e) => e.lineId.contains("123")).toList();
+          _newss = _newss.where((e) => e.lineId.contains(queryStr)).toList();
           int aa = _newss.length;
           int bb = snapshot.data.result.records.length;
           //print(aa.toString() + " :" + bb.toString());
